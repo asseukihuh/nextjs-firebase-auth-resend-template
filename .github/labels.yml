@@ -1,0 +1,133 @@
+# GitHub Labels Configuration
+# These labels help organize and categorize issues and pull requests
+# 
+# To apply these labels to your repository, you can:
+# 1. Use GitHub CLI: gh label create -l 000000 -d "description" name
+# 2. Apply manually in Repository Settings > Labels
+# 3. Use a tool like GitHub Labels Manager
+
+# Priority Labels
+- name: "priority: critical"
+  color: "ff0000"
+  description: "Requires immediate attention and action"
+
+- name: "priority: high"
+  color: "ff6b6b"
+  description: "Important and should be addressed soon"
+
+- name: "priority: medium"
+  color: "ffd93d"
+  description: "Important but can wait"
+
+- name: "priority: low"
+  color: "90ee90"
+  description: "Nice to have, can be deferred"
+
+# Type Labels
+- name: "type: bug"
+  color: "d73a49"
+  description: "Something isn't working"
+
+- name: "type: enhancement"
+  color: "a2eeef"
+  description: "New feature or request"
+
+- name: "type: documentation"
+  color: "0075ca"
+  description: "Improvements or additions to documentation"
+
+- name: "type: refactoring"
+  color: "5319e7"
+  description: "Code cleanup or restructuring"
+
+- name: "type: performance"
+  color: "ffc700"
+  description: "Performance improvement or optimization"
+
+- name: "type: security"
+  color: "ff6b6b"
+  description: "Security vulnerability or improvement"
+
+# Status Labels
+- name: "status: blocked"
+  color: "d73a49"
+  description: "Blocked by another issue or PR"
+
+- name: "status: in-progress"
+  color: "ffc700"
+  description: "Currently being worked on"
+
+- name: "status: review-needed"
+  color: "fbca04"
+  description: "Needs review"
+
+- name: "status: waiting-feedback"
+  color: "cccccc"
+  description: "Waiting for feedback from reporter or reviewer"
+
+- name: "status: ready"
+  color: "90ee90"
+  description: "Ready to be worked on"
+
+# Difficulty Labels
+- name: "difficulty: beginner"
+  color: "90ee90"
+  description: "Good for newcomers and first-time contributors"
+
+- name: "difficulty: intermediate"
+  color: "ffc700"
+  description: "Requires some knowledge of the codebase"
+
+- name: "difficulty: advanced"
+  color: "ff6b6b"
+  description: "Requires deep knowledge of the codebase"
+
+# Area Labels
+- name: "area: authentication"
+  color: "0075ca"
+  description: "Related to authentication and authorization"
+
+- name: "area: email"
+  color: "0075ca"
+  description: "Related to email service (Resend)"
+
+- name: "area: database"
+  color: "0075ca"
+  description: "Related to Firebase/Firestore"
+
+- name: "area: ui"
+  color: "0075ca"
+  description: "Related to user interface"
+
+- name: "area: deployment"
+  color: "0075ca"
+  description: "Related to deployment and DevOps"
+
+- name: "area: tests"
+  color: "0075ca"
+  description: "Related to testing"
+
+# Special Labels
+- name: "good-first-issue"
+  color: "7057ff"
+  description: "Good for newcomers"
+
+- name: "help-wanted"
+  color: "33aa3f"
+  description: "Extra attention is needed"
+
+- name: "wontfix"
+  color: "ffffff"
+  description: "This will not be worked on"
+
+- name: "duplicate"
+  color: "cccccc"
+  description: "This issue or pull request already exists"
+
+- name: "question"
+  color: "d876e3"
+  description: "Further information is requested"
+
+- name: "dependencies"
+  color: "0366d6"
+  description: "Pull requests that update a dependency file"

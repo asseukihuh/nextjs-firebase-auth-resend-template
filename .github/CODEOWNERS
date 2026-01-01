@@ -1,0 +1,25 @@
+# SaaS Template Code Owners
+# This file specifies who should review pull requests to different parts of the codebase
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - review all changes
+* @yourusername
+
+# Authentication and security critical paths
+/src/app/api/auth/ @yourusername
+/src/lib/firebase-admin.ts @yourusername
+/src/lib/firebase-client.ts @yourusername
+
+# Documentation
+/README.md @yourusername
+/DEPLOYMENT.md @yourusername
+/SECURITY.md @yourusername
+/CONTRIBUTING.md @yourusername
+
+# Configuration files
+Dockerfile @yourusername
+docker-compose.yml @yourusername
+nginx.example.conf @yourusername
+
+# GitHub configuration
+.github/ @yourusername
