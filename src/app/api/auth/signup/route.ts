@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { admin } from '@/lib/firebase-admin';
 import { resend } from '@/lib/resend';
+import { buildVerificationLink } from '@/lib/links';
+import { verificationEmail } from '@/lib/email-templates';
+import { getEmailReplyTo, getResendFromHeader } from '@/lib/app-config';
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
@@ -87,19 +90,14 @@ export async function POST(req: NextRequest) {
 
     // ✅ Envoyer email de vérification
     console.log('📧 Sending verification email...');
-    const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify-email?token=${verificationToken}&uid=${uid}`;
+    const verificationLink = buildVerificationLink(verificationToken, uid);
+    const replyTo = getEmailReplyTo();
 
     await resend.emails.send({
-      from: 'NY-ERP <onboarding@resend.dev>',
+      from: getResendFromHeader(),
+      ...(replyTo ? { replyTo } : {}),
       to: trimmedEmail,
-      subject: 'Vérifiez votre email - NY-ERP',
-      html: `
-        <h2>Bienvenue sur NY-ERP!</h2>
-        <p>Merci de vous être inscrit(e).</p>
-        <p><a href="${verificationLink}" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">Vérifier mon email</a></p>
-        <p>Ou copiez ce lien: ${verificationLink}</p>
-        <p>Le lien expire dans 24 heures.</p>
-      `,
+      ...verificationEmail(verificationLink),
     });
 
     console.log('✅ Signup successful');

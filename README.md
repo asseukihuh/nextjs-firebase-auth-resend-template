@@ -1,6 +1,34 @@
 ﻿# Next.js Firebase Auth + Resend Template
 
 A production-ready authentication template for Next.js with Firebase, Resend email verification, and complete account management.
+## 🚀 5-minute localhost setup 
+
+1) Clone + install
+```bash
+git clone <your-repo-url>
+cd <repo>
+pnpm install  # or npm install / yarn
+```
+
+2) Env file
+```bash
+cp .env.local.example .env.local
+```
+Fill these fields at minimum:
+- NEXT_PUBLIC_FIREBASE_API_KEY
+- NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+- NEXT_PUBLIC_FIREBASE_PROJECT_ID
+- NEXT_PUBLIC_FIREBASE_APP_ID
+- FIREBASE_SERVICE_ACCOUNT_KEY (or FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY with \\n newlines)
+- RESEND_API_KEY
+- APP_BASE_URL=http://localhost:3000
+- APP_NAME=Your App
+
+3) Run
+```bash
+pnpm dev
+```
+Open http://localhost:3000 and use the built-in signup/login flows.
 
 ## Features
 
@@ -55,12 +83,24 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
 # Firebase Admin SDK (Server-side)
-FIREBASE_SERVICE_ACCOUNT_KEY='{"type":"service_account","project_id":"...","...":"..."}'
+# Option A: full JSON string
+FIREBASE_SERVICE_ACCOUNT_KEY='{"type":"service_account","project_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\\n...\\n-----END PRIVATE KEY-----\\n","client_email":"..."}'
+
+# Option B: split fields (easier on Vercel/VPS)
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk@your_project.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\\n...\\n-----END PRIVATE KEY-----\\n"
 
 # Resend Email
 RESEND_API_KEY=re_xxxxxxxxxxxxx
+RESEND_FROM_EMAIL=onboarding@resend.dev
+# Optional reply-to
+# RESEND_REPLY_TO=support@yourdomain.com
 
-# App Configuration
+# Application
+APP_NAME=Your App
+APP_BASE_URL=http://localhost:3000
+# Fallback for legacy pages (optional)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NODE_ENV=development
 ```
@@ -76,7 +116,10 @@ NODE_ENV=development
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase Console → Settings → Web App → messagingSenderId | |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase Console → Settings → Web App → appId | |
 | `FIREBASE_SERVICE_ACCOUNT_KEY` | Firebase Console → Settings → Service Accounts → Generate New Private Key | **GARDEZ SECRET** |
+| `FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY` | Same as above (split fields) | Use `\n` for newlines |
 | `RESEND_API_KEY` | Resend Dashboard → API Keys | **GARDEZ SECRET** |
+| `APP_BASE_URL` | Your site origin used in email links | Required in production |
+| `APP_NAME` | Branding used in emails | Optional |
 
 ### 5. Configuration Firestore
 
@@ -119,6 +162,16 @@ pnpm start
 ```
 
 L'application sera disponible sur `http://localhost:3000`
+
+## Réutiliser ce template dans un autre projet Next.js
+
+1. Copiez les dossiers suivants dans votre projet cible: `src/lib` (Firebase/Resend + templates), `src/app/api/auth/*` (routes), `src/app/(auth)` (pages), et les composants UI d'authentification.
+2. Ajoutez un `.env.local` à partir de `.env.example` en renseignant Firebase, Resend, `APP_BASE_URL` (origin de l'app) et `APP_NAME`.
+3. Installez les dépendances minimales: `pnpm add firebase resend` (ou `npm/yarn` équivalent).
+4. Déploiement:
+  - Localhost: `pnpm dev` avec `APP_BASE_URL=http://localhost:3000`.
+  - Vercel: ajoutez toutes les variables d'environnement dans le dashboard (utilisez la forme "split" des clés Firebase pour éviter les sauts de ligne).
+  - VPS/Docker: renseignez les mêmes variables dans `.env` ou `docker-compose.yml`, puis `pnpm build && pnpm start` ou `pm2 start "pnpm start"`.
 
 ## Structure du Projet
 
@@ -192,24 +245,14 @@ public/                            # Assets statiques
 
 ### Domaine par défaut (développement)
 
-```typescript
-// src/lib/resend.ts
-from: 'onboarding@resend.dev'  // Domaine Resend par défaut
-```
+- Utilisez `RESEND_FROM_EMAIL=onboarding@resend.dev` (domaine sandbox Resend)
+- Optionnel: `RESEND_REPLY_TO=support@localhost`
 
 ### Domaine personnalisé (production)
 
-1. Dans Resend Dashboard, vérifiez votre domaine
-2. Remplacez `from` par votre domaine :
-
-```typescript
-from: 'noreply@yourdomain.com'
-```
-
-3. Mettez à jour tous les fichiers qui envoient des emails :
-   - `src/app/api/auth/signup/route.ts`
-   - `src/app/api/auth/change-email/route.ts`
-   - `src/app/api/auth/send-verification-email/route.ts`
+1. Dans Resend Dashboard, vérifiez votre domaine.
+2. Définissez `RESEND_FROM_EMAIL=noreply@yourdomain.com` et éventuellement `RESEND_REPLY_TO=support@yourdomain.com` dans vos variables d'environnement.
+3. Déployez: les routes utilisent automatiquement ces variables via les helpers `resend` et `email-templates`.
 
 ## Déploiement
 

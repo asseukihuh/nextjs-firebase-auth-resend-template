@@ -13,6 +13,10 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId || !firebaseConfig.appId) {
+  throw new Error('Missing Firebase client env vars. Please set NEXT_PUBLIC_FIREBASE_* values.');
+}
+
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 export const auth = getAuth(app);

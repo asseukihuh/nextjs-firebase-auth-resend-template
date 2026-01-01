@@ -1,23 +1,40 @@
-import admin from 'firebase-admin';
+import admin, { ServiceAccount } from 'firebase-admin';
 
-const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+const parseServiceAccount = (): ServiceAccount => {
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
-if (!serviceAccountKey) {
-  throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY not found in environment variables');
-}
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      console.error('Invalid FIREBASE_SERVICE_ACCOUNT_KEY JSON');
+      throw error;
+    }
+  }
 
-let app;
+  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error('Missing Firebase admin env. Provide FIREBASE_SERVICE_ACCOUNT_KEY or FIREBASE_PROJECT_ID/FIREBASE_CLIENT_EMAIL/FIREBASE_PRIVATE_KEY');
+  }
+
+  return {
+    projectId,
+    clientEmail,
+    privateKey,
+  } as ServiceAccount;
+};
 
 try {
-  const serviceAccount = JSON.parse(serviceAccountKey);
-  
+  const serviceAccount = parseServiceAccount();
+
   if (!admin.apps.length) {
-    app = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      projectId: serviceAccount.projectId,
     });
-  } else {
-    app = admin.app();
   }
 } catch (error) {
   console.error('Firebase Admin initialization error:', error);

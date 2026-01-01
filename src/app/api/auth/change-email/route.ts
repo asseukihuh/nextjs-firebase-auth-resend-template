@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { admin } from '@/lib/firebase-admin';
 import { resend } from '@/lib/resend';
+import { buildEmailChangeLink } from '@/lib/links';
+import { confirmEmailChangeEmail } from '@/lib/email-templates';
+import { getEmailReplyTo, getResendFromHeader } from '@/lib/app-config';
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
@@ -50,21 +53,16 @@ export async function POST(req: NextRequest) {
     // Envoyer un email de confirmation au NOUVEL email
     console.log('📧 Sending confirmation email to:', newEmail);
     console.log('🔑 RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
-    const confirmationLink = `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm-email-change?token=${confirmationToken}&uid=${uid}`;
+    const confirmationLink = buildEmailChangeLink(confirmationToken, uid);
 
     try {
+      const replyTo = getEmailReplyTo();
+
       const emailResponse = await resend.emails.send({
-        from: 'NY-ERP <onboarding@resend.dev>',
+        from: getResendFromHeader(),
+        ...(replyTo ? { replyTo } : {}),
         to: newEmail,
-        subject: 'Confirmez votre changement d\'email - NY-ERP',
-        html: `
-          <h2>Confirmation de changement d'email</h2>
-          <p>Vous avez demandé de changer votre email de <strong>${currentEmail}</strong> à <strong>${newEmail}</strong>.</p>
-          <p><a href="${confirmationLink}" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">Confirmer le changement</a></p>
-          <p>Ou copiez ce lien: ${confirmationLink}</p>
-          <p>Ce lien expire dans 24 heures.</p>
-          <p>Si vous n'avez pas demandé ce changement, ignorez cet email.</p>
-        `,
+        ...confirmEmailChangeEmail(confirmationLink, currentEmail || '', newEmail),
       });
       console.log('✅ Email sent response:', emailResponse);
       if (emailResponse.error) {
